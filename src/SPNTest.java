@@ -6,25 +6,25 @@ import java.util.Map;
  */
 public class SPNTest {
     public static void main(String[] args) {
-        Map<Integer, Integer> sBox = new HashMap<>();
+        Map<String, String> sBox = new HashMap<>();
         Map<Integer, Integer> perm = new HashMap<>();
 
-        sBox.put(0, 14);
-        sBox.put(1, 4);
-        sBox.put(2, 13);
-        sBox.put(3, 1);
-        sBox.put(4, 2);
-        sBox.put(5, 15);
-        sBox.put(6, 11);
-        sBox.put(7, 8);
-        sBox.put(8, 3);
-        sBox.put(9, 10);
-        sBox.put(10, 6);
-        sBox.put(11, 12);
-        sBox.put(12, 5);
-        sBox.put(13, 9);
-        sBox.put(14, 0);
-        sBox.put(15, 7);
+        sBox.put("0000", "1110");
+        sBox.put("0001", "0100");
+        sBox.put("0010", "1101");
+        sBox.put("0011", "0001");
+        sBox.put("0100", "0010");
+        sBox.put("0101", "1111");
+        sBox.put("0110", "1011");
+        sBox.put("0111", "1000");
+        sBox.put("1000", "0011");
+        sBox.put("1001", "1010");
+        sBox.put("1010", "0110");
+        sBox.put("1011", "1100");
+        sBox.put("1100", "0101");
+        sBox.put("1101", "1001");
+        sBox.put("1110", "0000");
+        sBox.put("1111", "0111");
 
         perm.put(0, 0);
         perm.put(1, 4);
@@ -43,10 +43,11 @@ public class SPNTest {
         perm.put(14, 11);
         perm.put(15, 15);
 
-        System.out.println((int) 'a');
-
         SPN s = new SPN(4, 4, 4, sBox, perm, 32);
 
-        System.out.println(s.encrypt("abc", "00111010100101001101011000111111"));
+        // System.out.println(s.encrypt("abc", "00111010100101001101011000111111"));
+        s.sTransform("1111000011110000");
+        s.permutate("1111000011110000");
+        s.xor("0100", "1111");
     }
 }

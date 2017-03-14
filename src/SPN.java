@@ -9,9 +9,10 @@ import java.util.Map;
 public class SPN {
 
     private int r, n, m, s;
-    private Map<Integer, Integer> sBox, perm;
+    private Map<String, String> sBox;
+    private Map<Integer, Integer> perm;
 
-    public SPN(int r, int n, int m, Map<Integer, Integer> sBox, Map<Integer, Integer> perm, int s) {
+    public SPN(int r, int n, int m, Map<String, String> sBox, Map<Integer, Integer> perm, int s) {
         this.r = r;
         this.n = n;
         this.m = m;
@@ -63,15 +64,49 @@ public class SPN {
     }
 
     public String xor(String a, String b) {
-        return "";
+
+        if (a.length() != b.length()) {
+            throw new IllegalArgumentException();
+        }
+
+        StringBuilder afterXOR = new StringBuilder();
+
+        for (int i = 0; i < a.length(); i++) {
+            if (a.charAt(i) != b.charAt(i)) {
+                afterXOR.append("1");
+            } else {
+                afterXOR.append("0");
+            }
+        }
+
+        System.out.println("XOR passed. Input: " +a +" | " +b +" Output: " +afterXOR.toString());
+        return afterXOR.toString();
     }
 
     public String sTransform(String a) {
-        return "";
+        String[] splitted = new String[4];
+        StringBuilder afterBox = new StringBuilder();
+
+        for (int i = 0; i < 4; i++) {
+            splitted[i] = a.substring(i*4,i*4+4);
+        }
+        for (int i = 0; i < splitted.length; i++) {
+            afterBox.append(sBox.get(splitted[i]));
+        }
+        System.out.println("sBox passed. Input: " +a +" Output: " +afterBox.toString());
+        return afterBox.toString();
     }
 
     public String permutate(String a) {
-        return "";
+        StringBuilder after = new StringBuilder(a);
+
+        for (int i = 0; i < 16; i++) {
+            after.setCharAt(perm.get(i), a.charAt(i));
+        }
+
+        System.out.println("Perm passed. Input: " +a + " Output: " +after.toString());
+
+        return after.toString();
     }
 
     public String bitstringify(String source) {
