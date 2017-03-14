@@ -46,8 +46,7 @@ public class SPNTest {
         System.out.println((int) 'a');
 
         SPN s = new SPN(4, 4, 4, sBox, perm, 32);
-        Byte[] key = new Byte[] { 0b0011, 0b1010, 0b1001, 0b0100, 0b1101, 0b0110, 0b0011, 0b1111 };
 
-        System.out.println(s.encrypt("abc", key));
+        System.out.println(s.encrypt("abc", "00111010100101001101011000111111"));
     }
 }
