@@ -2,7 +2,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Sacha on 10.3.17.
+ * Developed by Sacha Schmid, Tobias Baumgartner, Rinesch Murugathas.
  */
 public class SPNTest {
     public static void main(String[] args) {

@@ -5,7 +5,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
- * Created by Sacha on 10.3.17.
+ * Developed by Sacha Schmid, Tobias Baumgartner, Rinesch Murugathas.
  */
 
 public class SPN {
