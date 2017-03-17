@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * Created by Sacha on 10.3.17.
@@ -22,49 +24,92 @@ public class SPN {
     }
 
     public String encrypt(String source, String key) {
-        String bitstring = bitstringify(source);
-
-        if (bitstring.length() % (n * m) != 0) {
-            bitstring += "1";
+        if (source.length() % (n * m) != 0) {
+            source += "1";
         }
 
-        while (bitstring.length() % (n * m) != 0) {
-            bitstring += "0";
+        while (source.length() % (n * m) != 0) {
+            source += "0";
         }
+
+        // THIS IS y-1
+        String yn = "0000010011010010";
 
         List<String> parts = new ArrayList<>();
 
-        while (bitstring.length() > 0) {
-            parts.add(bitstring.substring(0, n * m));
-            bitstring = bitstring.substring(n * m, bitstring.length());
+        while (source.length() > 0) {
+            parts.add(source.substring(0, n * m));
+            source = source.substring(n * m, source.length());
+        }
+
+        List<String> transformed = new ArrayList<>();
+
+        transformed.add(yn);
+
+        parts.forEach(p -> {
+            String curY = yn;
+            int curYAsInt = intify(curY);
+
+            curYAsInt += transformed.size() - 1;
+            curYAsInt %= Math.pow(2, n * m);
+            curY = bitstringify(curYAsInt);
+
+            String part = xor(curY, key.substring(0, n * m));
+
+            for (int i = 1; i < r; i++) {
+                part = sTransform(part);
+                part = permutate(part);
+                part = xor(part, key.substring(n * i, (n * m) + n * i));
+            }
+
+            part = sTransform(part);
+            part = xor(part, key.substring(n * r, (n * m) + n * r));
+
+            transformed.add(xor(part, p));
+        });
+
+        return transformed.stream().collect(Collectors.joining());
+    }
+
+    public String decrypt(String cypher, String key) {
+        String yn = cypher.substring(0, n * m);
+        cypher = cypher.substring(n * m, cypher.length());
+
+        List<String> parts = new ArrayList<>();
+
+        while (cypher.length() > 0) {
+            parts.add(cypher.substring(0, n * m));
+            cypher = cypher.substring(n * m, cypher.length());
         }
 
         List<String> transformed = new ArrayList<>();
 
         parts.forEach(p -> {
-            String part = xor(p, key.substring(0, n * m - 1));
+            String curY = yn;
+            int curYAsInt = intify(curY);
+
+            curYAsInt += transformed.size();
+            curYAsInt %= Math.pow(2, n * m);
+            curY = bitstringify(curYAsInt);
+
+            String part = xor(curY, key.substring(0, n * m));
 
             for (int i = 1; i < r; i++) {
                 part = sTransform(part);
                 part = permutate(part);
-                part = xor(part, key.substring(n * i, (n * m - 1) + n * i));
+                part = xor(part, key.substring(n * i, (n * m) + n * i));
             }
 
             part = sTransform(part);
-            part = xor(part, key.substring(n * r, (n * m - 1) + n * r));
+            part = xor(part, key.substring(n * r, (n * m) + n * r));
 
-            transformed.add(part);
+            transformed.add(xor(part, p));
         });
 
-        return transformed.toString();
-    }
-
-    public String decrypt(String cypher, String key) {
-        return "";
+        return transformed.stream().collect(Collectors.joining());
     }
 
     public String xor(String a, String b) {
-
         if (a.length() != b.length()) {
             throw new IllegalArgumentException();
         }
@@ -79,7 +124,6 @@ public class SPN {
             }
         }
 
-        System.out.println("XOR passed. Input: " +a +" | " +b +" Output: " +afterXOR.toString());
         return afterXOR.toString();
     }
 
@@ -90,10 +134,11 @@ public class SPN {
         for (int i = 0; i < 4; i++) {
             splitted[i] = a.substring(i*4,i*4+4);
         }
+
         for (int i = 0; i < splitted.length; i++) {
             afterBox.append(sBox.get(splitted[i]));
         }
-        System.out.println("sBox passed. Input: " +a +" Output: " +afterBox.toString());
+
         return afterBox.toString();
     }
 
@@ -104,30 +149,36 @@ public class SPN {
             after.setCharAt(perm.get(i), a.charAt(i));
         }
 
-        System.out.println("Perm passed. Input: " +a + " Output: " +after.toString());
-
         return after.toString();
     }
 
-    public String bitstringify(String source) {
-        StringBuilder s = new StringBuilder();
+    private String randomY(int length) {
+        StringBuilder sb = new StringBuilder();
+        Random r = new Random();
 
-        for (int i = 0; i < source.length(); i++) {
-            StringBuilder r = new StringBuilder();
-
-            int j = (int) source.charAt(i);
-            for (int k = 0; k < 8; k++) {
-                if ((j % 2) == 1) {
-                    r.insert(0, '1');
-                } else {
-                    r.insert(0, '0');
-                }
-                j = j / 2;
-            }
-
-            s.append(r.toString());
+        for (int i = 0; i < length; i++) {
+            sb.append(r.nextInt(1));
         }
 
-        return s.toString();
+        return sb.toString();
+    }
+
+    private int intify(String bitstring) {
+        return Integer.parseInt(bitstring, 2);
+    }
+
+    private String bitstringify(int num) {
+        StringBuilder sb = new StringBuilder();
+
+        while (num > 0) {
+            sb.insert(0, num % 2 == 1 ? '1' : '0');
+            num = (int) Math.floor(num / 2);
+        }
+
+        while (sb.length() % (n * m) != 0) {
+            sb.insert(0, '0');
+        }
+
+        return sb.toString();
     }
 }
