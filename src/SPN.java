@@ -45,8 +45,6 @@ public class SPN {
 
         String yMinusOne = randomY(n * m);
 
-        System.out.println(yMinusOne);
-
         // Split the source text into parts of length n * m.
 
         List<String> parts = new ArrayList<>();
